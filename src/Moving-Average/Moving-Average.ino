@@ -23,6 +23,7 @@ void loop() {
   int input_val = random(1, 100);
   int sma_val = filter.simpleMovingAverage(input_val, 10);
   int ca_val = filter.cumulativeAverage(input_val);
+  int wma_val = filter.weightedMovingAverage(input_val, 10);
 
   filter.print();
   delay(100);
