@@ -25,7 +25,7 @@ public:
   void begin();
   void end();
   void print();
-  int simpleMovingAverage(int input, uint8_t window_size);
+  int MovingAverage::simpleMovingAverage(int input, uint8_t window_size);
   int cumulativeAverage(int input);
   int weightedMovingAverage(int input, uint8_t window_size);
 private:

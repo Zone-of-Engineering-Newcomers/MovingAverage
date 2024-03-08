@@ -30,11 +30,10 @@ int MovingAverage::simpleMovingAverage(int input, uint8_t window_size) {
   if (!this->enabled) return NULL;
 
   this->input = input;
-  window_size = constrain(window_size, 2, 100);
 
   static bool filled;
   static uint8_t index;
-  static int buffer[100];
+  static int* buffer = new int[window_size];
   static int sum;
 
   sum += input;
@@ -60,15 +59,19 @@ int MovingAverage::simpleMovingAverage(int input, uint8_t window_size) {
 int MovingAverage::cumulativeAverage(int input) {
   if (!this->enabled) return NULL;
 
-  static uint16_t index = 1;
-  static int32_t sum;
-  static int16_t average;
+  static int16_t index;
+  static float average;
 
-  sum += input;
-  average = sum / index;
+  if (index <= 2) {
+    average += input;
+    index++;
+    average /= index;
+  } else {
+    index++;
+    average = (input + average * (index - 1)) / index;
+  }
 
-  index++;
-  this->ca_output = average;
+  this->ca_output = int(average);
   return this->ca_output;
 }
 
