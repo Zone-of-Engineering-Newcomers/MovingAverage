@@ -2,12 +2,12 @@
  * STORAGE
  *
  * Empty file:
- * - total: 51488 Bytes (19%)
- * - global variables: 6744 Bytes (20%)
+ * - total: 1332 Bytes (4%)
+ * - global variables: 184 Bytes (8%)
  *
  * Simple Sketch:
- * - total: 51992 Bytes (20%)
- * - global variables: 6756 Bytes (20%)
+ * - total: 4660 Bytes (14%)
+ * - global variables: 269 Bytes (13%)
 */
 
 #include "MovingAverage.h"
@@ -23,7 +23,6 @@ void loop() {
   int input_val = random(1, 100);
   int sma_val = filter.simpleMovingAverage(input_val, 10);
   int ca_val = filter.cumulativeAverage(input_val);
-  int wma_val = filter.weightedMovingAverage(input_val, 10);
 
   filter.print();
   delay(100);
