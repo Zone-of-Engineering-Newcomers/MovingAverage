@@ -22,6 +22,8 @@ void MovingAverage::print() {
   Serial.print(this->sma_output);
   Serial.print("\tCA:");
   Serial.print(this->ca_output);
+  Serial.print("\tWMA:");
+  Serial.print(this->wma_output);
   Serial.print("\n");
 }
 
@@ -71,4 +73,37 @@ int MovingAverage::cumulativeAverage(int input) {
 
   this->ca_output = int(average);
   return this->ca_output;
+}
+
+int MovingAverage::weightedMovingAverage(int input, uint8_t window_size) {
+  if (!this->enabled) return 0;
+
+  this->input = input;
+
+  static uint8_t num_samples;
+  static int* buffer = new int[window_size];
+  static int sum;
+  uint8_t weight;
+
+  if (num_samples < window_size) {
+    weight = num_samples + 1;
+    buffer[num_samples] = input;
+    sum += input * weight;
+    num_samples++;
+  } else {
+    for (uint8_t i = 0; i < window_size - 1; i++) {
+      weight = i + 1;
+      sum -= buffer[i] * weight;
+      buffer[i] = buffer[i + 1];
+      sum += buffer[i] * weight;
+    }
+    weight = window_size;
+    sum -= buffer[window_size - 1] * weight;
+    buffer[window_size - 1] = input;
+    sum += input * weight;
+  }
+
+  this->wma_output = 2 * sum / (window_size * (window_size + 1));
+
+  return this->wma_output;
 }

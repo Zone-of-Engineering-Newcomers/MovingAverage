@@ -6,7 +6,7 @@
  * - global variables: 184 Bytes (8%)
  *
  * Simple Sketch:
- * - total: 4660 Bytes (14%)
+ * - total: 5004 Bytes (14%)
  * - global variables: 269 Bytes (13%)
 */
 
@@ -23,6 +23,7 @@ void loop() {
   int input_val = random(1, 100);
   int sma_val = filter.simpleMovingAverage(input_val, 10);
   int ca_val = filter.cumulativeAverage(input_val);
+  int wma_val = filter.weightedMovingAverage(input_val, 10);
 
   filter.print();
   delay(100);
