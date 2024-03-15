@@ -2,8 +2,8 @@
  * @file MovingAverage.h
  *
  * @author Maximilian Kautzsch
- * @copyright Copyright 2024 Maximilian Kautzsch
- * Licensed under MIT license.
+ * @copyright Copyright (c) 2024 Maximilian Kautzsch
+ * Licensed under MIT License.
  *
  */
 
