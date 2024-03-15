@@ -268,8 +268,11 @@ U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
 template<typename T, typename U>
 U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor) {
   if (!this->enabled) return 0;
-
-  this->ema_output = smoothing_factor * (this->input) + (1 - smoothing_factor) * this->ema_output;
+  
+  static U last_average;
+  
+  this->ema_output = smoothing_factor * (this->input) + (1 - smoothing_factor) * last_average;
+  last_average = this->ema_output;
 
   return this->ema_output;
 }

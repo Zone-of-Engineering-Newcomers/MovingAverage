@@ -8,8 +8,8 @@
  * - global variables: 184 Bytes (8%)
  *
  * Simple Sketch:
- * - total: 5144 Bytes (15%)
- * - global variables: 277 Bytes (13%)
+ * - total: 5152 Bytes (15%)
+ * - global variables: 279 Bytes (13%)
 */
 
 #include "MovingAverage.h"
