@@ -15,12 +15,14 @@ public:
   int simpleMovingAverage(int input, uint8_t window_size);
   int cumulativeAverage(int input);
   int weightedMovingAverage(int input, uint8_t window_size);
+  int exponentialMovingAverage(int input, uint8_t window_size, float smoothing_factor);
 private:
   bool enabled;
   int input;
   int sma_output;
   int ca_output;
   int wma_output;
+  int ema_output;
 };
 
 #endif
