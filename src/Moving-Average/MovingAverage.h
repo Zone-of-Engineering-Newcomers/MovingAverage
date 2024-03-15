@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2024 Maximilian Kautzsch
  * Licensed under MIT License.
  *
- */
+*/
 
 #ifndef MOVINGAVERAGE_H
 #define MOVINGAVERAGE_H
@@ -33,12 +33,13 @@ public:
 
   void begin();
   void end();
+  void add(T input);
   void print(uint8_t average_types);
   void print();
-  U simpleMovingAverage(T input, uint8_t window_size);
-  U cumulativeAverage(T input);
-  U weightedMovingAverage(T input, uint8_t window_size);
-  U exponentialMovingAverage(T input, uint8_t window_size, float smoothing_factor);
+  U readAverage(uint8_t window_size);
+  U readCumulativeAverage();
+  U readWeightedAverage(uint8_t window_size);
+  U readExponentialAverage(float smoothing_factor);
 
 private:
   bool enabled;
@@ -51,13 +52,13 @@ private:
 
 /**
  * @brief Constructs a new MovingAverage object.
- */
+*/
 template<typename T, typename U>
 MovingAverage<T, U>::MovingAverage() {}
 
 /**
  * @brief Destructs a constructed MovingAverage object.
- */
+*/
 template<typename T, typename U>
 MovingAverage<T, U>::~MovingAverage() {}
 
@@ -65,7 +66,7 @@ MovingAverage<T, U>::~MovingAverage() {}
  * @brief Initializes the MovingAverage object.
  *
  * Toggles the 'enabled' class attribtute to true.
- */
+*/
 template<typename T, typename U>
 void MovingAverage<T, U>::begin() {
   this->enabled = true;
@@ -75,10 +76,20 @@ void MovingAverage<T, U>::begin() {
  * @brief Stops the MovingAverage object.
  *
  * Toggles the 'enabled' class attribtute to false.
- */
+*/
 template<typename T, typename U>
 void MovingAverage<T, U>::end() {
   this->enabled = false;
+}
+
+/**
+ * @brief Adds a new data point to the filter.
+ *
+ * @param input The new data point that is being added to the filter.
+*/
+template<typename T, typename U>
+void MovingAverage<T, U>::add(T input) {
+  this->input = input;
 }
 
 /**
@@ -89,7 +100,7 @@ void MovingAverage<T, U>::end() {
  * based on the selected average types.
  *
  * @param average_types Bitmask representing the average types to print.
- */
+*/
 template<typename T, typename U>
 void MovingAverage<T, U>::print(uint8_t average_types) {
   while (!Serial) {
@@ -123,7 +134,7 @@ void MovingAverage<T, U>::print(uint8_t average_types) {
  *
  * The raw data points as well as all of the calculated average filter outputs
  * are printed through the serial monitor.
- */
+*/
 template<typename T, typename U>
 void MovingAverage<T, U>::print() {
   this->print(SMA | CA | WMA | EMA);
@@ -139,21 +150,18 @@ void MovingAverage<T, U>::print() {
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Simple Moving Average (SMA).
- */
+*/
 template<typename T, typename U>
-U MovingAverage<T, U>::simpleMovingAverage(T input, uint8_t window_size) {
-  if (!this->enabled)
-    return 0;
-
-  this->input = input;
+U MovingAverage<T, U>::readAverage(uint8_t window_size) {
+  if (!this->enabled) return 0;
 
   static uint8_t num_samples;
   static U *buffer = new U[window_size];
   static U sum;
 
   if (num_samples < window_size) {
-    buffer[num_samples] = input;
-    sum += input;
+    buffer[num_samples] = this->input;
+    sum += this->input;
     num_samples++;
   } else {
     for (uint8_t i = 0; i < window_size - 1; i++) {
@@ -162,11 +170,11 @@ U MovingAverage<T, U>::simpleMovingAverage(T input, uint8_t window_size) {
       sum += buffer[i];
     }
     sum -= buffer[window_size - 1];
-    buffer[window_size - 1] = input;
+    buffer[window_size - 1] = this->input;
     sum += buffer[window_size - 1];
   }
 
-  this->sma_output = sum / min(num_samples, window_size);
+  this->sma_output = sum / num_samples;
 
   return this->sma_output;
 }
@@ -180,24 +188,21 @@ U MovingAverage<T, U>::simpleMovingAverage(T input, uint8_t window_size) {
  *
  * @param input The input data point to be processed.
  * @return The calculated Cumulative Average (CA).
- */
+*/
 template<typename T, typename U>
-U MovingAverage<T, U>::cumulativeAverage(T input) {
-  if (!this->enabled)
-    return 0;
+U MovingAverage<T, U>::readCumulativeAverage() {
+  if (!this->enabled) return 0;
 
-  this->input = input;
-
-  static int16_t index;
+  static uint16_t index;
   static float average;
 
   if (index <= 2) {
-    average += input;
+    average += this->input;
     index++;
     average /= index;
   } else {
     index++;
-    average = (input + average * (index - 1)) / index;
+    average = (this->input + average * (index - 1)) / index;
   }
 
   this->ca_output = U(average);
@@ -215,13 +220,10 @@ U MovingAverage<T, U>::cumulativeAverage(T input) {
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Weighted Moving Average (WMA).
- */
+*/
 template<typename T, typename U>
-U MovingAverage<T, U>::weightedMovingAverage(T input, uint8_t window_size) {
-  if (!this->enabled)
-    return 0;
-
-  this->input = input;
+U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
+  if (!this->enabled) return 0;
 
   static uint8_t num_samples;
   static U *buffer = new U[window_size];
@@ -230,8 +232,8 @@ U MovingAverage<T, U>::weightedMovingAverage(T input, uint8_t window_size) {
 
   if (num_samples < window_size) {
     weight = num_samples + 1;
-    buffer[num_samples] = input;
-    sum += input * weight;
+    buffer[num_samples] = this->input;
+    sum += this->input * weight;
     num_samples++;
   } else {
     for (uint8_t i = 0; i < window_size - 1; i++) {
@@ -242,11 +244,11 @@ U MovingAverage<T, U>::weightedMovingAverage(T input, uint8_t window_size) {
     }
     weight = window_size;
     sum -= buffer[window_size - 1] * weight;
-    buffer[window_size - 1] = input;
-    sum += input * weight;
+    buffer[window_size - 1] = this->input;
+    sum += this->input * weight;
   }
 
-  this->wma_output = 2 * sum / (window_size * (window_size + 1));
+  this->wma_output = 2 * sum / (num_samples * (num_samples + 1));
 
   return this->wma_output;
 }
@@ -254,27 +256,20 @@ U MovingAverage<T, U>::weightedMovingAverage(T input, uint8_t window_size) {
 /**
  * @brief Calculates the Exponential Moving Average (EMA) for a given input.
  *
- * Calculates the EMA based on the provided input, window size, and smoothing factor.
- * Apply different weights to current values and the average.
+ * Calculates the EMA based on the provided input and smoothing factor.
+ * Apply different weights to current values and the previous average.
  * If the MovingAverage object is disabled, returns 0.
  *
  * @param input The input data point to be processed.
- * @param window_size The size of the data window (amount of data points used for
- * one calculation).
  * @param smoothing_factor In interval of [0; 1]. Applies more weight to current
  * values, if > 0, or weighs previous average heavier, if < 0.
  * @return The calculated Exponential Moving Average (EMA).
- */
+*/
 template<typename T, typename U>
-U MovingAverage<T, U>::exponentialMovingAverage(T input, uint8_t window_size, float smoothing_factor) {
-  if (!this->enabled)
-    return 0;
+U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor) {
+  if (!this->enabled) return 0;
 
-  this->input = input;
-
-  this->ema_output = this->simpleMovingAverage(input, window_size);
-
-  this->ema_output = smoothing_factor * input + (1 - smoothing_factor) * this->ema_output;
+  this->ema_output = smoothing_factor * (this->input) + (1 - smoothing_factor) * this->ema_output;
 
   return this->ema_output;
 }
