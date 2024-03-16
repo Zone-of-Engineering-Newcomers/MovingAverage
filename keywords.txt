@@ -1,0 +1,31 @@
+########################################
+# Syntax Coloring Map for MovingAverage
+########################################
+
+########################################
+# Datatypes (KEYWORD1)
+########################################
+
+MovingAverage		KEYWORD1
+
+########################################
+# Methods and Functions (KEYWORD2)
+########################################
+
+begin			KEYWORD2
+end			KEYWORD2
+add			KEYWORD2
+print			KEYWORD2
+readAverage		KEYWORD2
+readCumulativeAverage	KEYWORD2
+readWeightedAverage	KEYWORD2
+readExponentialAverage	KEYWORD2
+
+########################################
+# Constants (LITERAL1)
+########################################
+
+SMA			LITERAL1
+CA			LITERAL1
+WMA			LITERAL1
+EMA			LITERAL1
