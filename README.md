@@ -1,4 +1,4 @@
-# Moving Average Library for Arduino
+# MovingAverage Library for Arduino
 
 An easy to use Arduino library for moving average filtering.
 
