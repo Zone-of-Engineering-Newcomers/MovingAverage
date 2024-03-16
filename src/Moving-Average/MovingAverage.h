@@ -44,10 +44,10 @@ public:
 private:
   bool enabled;
   T input;
-  U sma_output;
-  U ca_output;
-  U wma_output;
-  U ema_output;
+  U simple_moving_average;
+  U cumulative_average;
+  U weighted_moving_average;
+  U exponential_moving_average;
 };
 
 /**
@@ -111,19 +111,19 @@ void MovingAverage<T, U>::print(uint8_t average_types) {
 
   if (average_types & SMA) {
     Serial.print("\tSMA:");
-    Serial.print(this->sma_output);
+    Serial.print(this->simple_moving_average);
   }
   if (average_types & CA) {
     Serial.print("\tCA:");
-    Serial.print(this->ca_output);
+    Serial.print(this->cumulative_average);
   }
   if (average_types & WMA) {
     Serial.print("\tWMA:");
-    Serial.print(this->wma_output);
+    Serial.print(this->weighted_moving_average);
   }
   if (average_types & EMA) {
     Serial.print("\tEMA:");
-    Serial.print(this->ema_output);
+    Serial.print(this->exponential_moving_average);
   }
 
   Serial.print("\n");
@@ -155,28 +155,28 @@ template<typename T, typename U>
 U MovingAverage<T, U>::readAverage(uint8_t window_size) {
   if (!this->enabled) return 0;
 
-  static uint8_t num_samples;
-  static U *buffer = new U[window_size];
+  static uint8_t num_elements;
+  static U *window = new U[window_size];
   static U sum;
 
-  if (num_samples < window_size) {
-    buffer[num_samples] = this->input;
+  if (num_elements < window_size) {
+    window[num_elements] = this->input;
     sum += this->input;
-    num_samples++;
+    num_elements++;
   } else {
     for (uint8_t i = 0; i < window_size - 1; i++) {
-      sum -= buffer[i];
-      buffer[i] = buffer[i + 1];
-      sum += buffer[i];
+      sum -= window[i];
+      window[i] = window[i + 1];
+      sum += window[i];
     }
-    sum -= buffer[window_size - 1];
-    buffer[window_size - 1] = this->input;
-    sum += buffer[window_size - 1];
+    sum -= window[window_size - 1];
+    window[window_size - 1] = this->input;
+    sum += window[window_size - 1];
   }
 
-  this->sma_output = sum / num_samples;
+  this->simple_moving_average = sum / num_elements;
 
-  return this->sma_output;
+  return this->simple_moving_average;
 }
 
 /**
@@ -193,27 +193,27 @@ template<typename T, typename U>
 U MovingAverage<T, U>::readCumulativeAverage() {
   if (!this->enabled) return 0;
 
-  static uint16_t index;
+  static uint16_t num_elements;
   static float average;
 
-  if (index <= 2) {
+  if (num_elements <= 2) {
     average += this->input;
-    index++;
-    average /= index;
+    num_elements++;
+    average /= num_elements;
   } else {
-    index++;
-    average = (this->input + average * (index - 1)) / index;
+    num_elements++;
+    average = (this->input + average * (num_elements - 1)) / num_elements;
   }
 
-  this->ca_output = U(average);
-  return this->ca_output;
+  this->cumulative_average = U(average);
+  return this->cumulative_average;
 }
 
 /**
  * @brief Calculates the Weighted Moving Average (WMA) for a given input.
  *
  * Calculates the WMA based on the provided input and window size.
- * Gives more weight to recent values and lesser weight to older values.
+ * Gives more weight_coefficient to recent values and lesser weight_coefficient to older values.
  * If the MovingAverage object is disabled, returns 0.
  *
  * @param input The input data point to be processed.
@@ -225,32 +225,32 @@ template<typename T, typename U>
 U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
   if (!this->enabled) return 0;
 
-  static uint8_t num_samples;
-  static U *buffer = new U[window_size];
+  static uint8_t num_elements;
+  static U *window = new U[window_size];
   static U sum;
-  uint8_t weight;
+  uint8_t weight_coefficient;
 
-  if (num_samples < window_size) {
-    weight = num_samples + 1;
-    buffer[num_samples] = this->input;
-    sum += this->input * weight;
-    num_samples++;
+  if (num_elements < window_size) {
+    weight_coefficient = num_elements + 1;
+    window[num_elements] = this->input;
+    sum += this->input * weight_coefficient;
+    num_elements++;
   } else {
     for (uint8_t i = 0; i < window_size - 1; i++) {
-      weight = i + 1;
-      sum -= buffer[i] * weight;
-      buffer[i] = buffer[i + 1];
-      sum += buffer[i] * weight;
+      weight_coefficient = i + 1;
+      sum -= window[i] * weight_coefficient;
+      window[i] = window[i + 1];
+      sum += window[i] * weight_coefficient;
     }
-    weight = window_size;
-    sum -= buffer[window_size - 1] * weight;
-    buffer[window_size - 1] = this->input;
-    sum += this->input * weight;
+    weight_coefficient = window_size;
+    sum -= window[window_size - 1] * weight_coefficient;
+    window[window_size - 1] = this->input;
+    sum += this->input * weight_coefficient;
   }
 
-  this->wma_output = 2 * sum / (num_samples * (num_samples + 1));
+  this->weighted_moving_average = 2 * sum / (num_elements * (num_elements + 1));
 
-  return this->wma_output;
+  return this->weighted_moving_average;
 }
 
 /**
@@ -261,7 +261,7 @@ U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
  * If the MovingAverage object is disabled, returns 0.
  *
  * @param input The input data point to be processed.
- * @param smoothing_factor In interval of [0; 1]. Applies more weight to current
+ * @param smoothing_factor In interval of [0; 1]. Applies more weight_coefficient to current
  * values, if > 0, or weighs previous average heavier, if < 0.
  * @return The calculated Exponential Moving Average (EMA).
 */
@@ -269,12 +269,12 @@ template<typename T, typename U>
 U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor) {
   if (!this->enabled) return 0;
   
-  static U last_average;
+  static U average;
   
-  this->ema_output = smoothing_factor * (this->input) + (1 - smoothing_factor) * last_average;
-  last_average = this->ema_output;
+  this->exponential_moving_average = smoothing_factor * (this->input) + (1 - smoothing_factor) * average;
+  average = this->exponential_moving_average;
 
-  return this->ema_output;
+  return this->exponential_moving_average;
 }
 
 #endif
