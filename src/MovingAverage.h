@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2024 Maximilian Kautzsch
  * Licensed under MIT License.
  *
-*/
+ */
 
 #ifndef MOVINGAVERAGE_H
 #define MOVINGAVERAGE_H
@@ -18,15 +18,17 @@
 #include "WProgram.h"
 #endif
 
-enum AverageType {
+enum AverageType
+{
   SMA = 1 << 0,
   CA = 1 << 1,
   WMA = 1 << 2,
   EMA = 1 << 3
 };
 
-template<typename T, typename U>
-class MovingAverage {
+template <typename T, typename U>
+class MovingAverage
+{
 public:
   MovingAverage();
   ~MovingAverage();
@@ -36,6 +38,7 @@ public:
   void add(T input);
   void print(uint8_t average_types);
   void print();
+  bool detectedPeak(T threshold, uint8_t consecutive_matches);
   U readAverage(uint8_t window_size);
   U readCumulativeAverage();
   U readWeightedAverage(uint8_t window_size);
@@ -52,23 +55,24 @@ private:
 
 /**
  * @brief Constructs a new MovingAverage object.
-*/
-template<typename T, typename U>
+ */
+template <typename T, typename U>
 MovingAverage<T, U>::MovingAverage() {}
 
 /**
  * @brief Destructs a constructed MovingAverage object.
-*/
-template<typename T, typename U>
+ */
+template <typename T, typename U>
 MovingAverage<T, U>::~MovingAverage() {}
 
 /**
  * @brief Initializes the MovingAverage object.
  *
  * Toggles the 'enabled' class attribtute to true.
-*/
-template<typename T, typename U>
-void MovingAverage<T, U>::begin() {
+ */
+template <typename T, typename U>
+void MovingAverage<T, U>::begin()
+{
   this->enabled = true;
 }
 
@@ -76,9 +80,10 @@ void MovingAverage<T, U>::begin() {
  * @brief Stops the MovingAverage object.
  *
  * Toggles the 'enabled' class attribtute to false.
-*/
-template<typename T, typename U>
-void MovingAverage<T, U>::end() {
+ */
+template <typename T, typename U>
+void MovingAverage<T, U>::end()
+{
   this->enabled = false;
 }
 
@@ -86,9 +91,10 @@ void MovingAverage<T, U>::end() {
  * @brief Adds a new data point to the filter.
  *
  * @param input The new data point that is being added to the filter.
-*/
-template<typename T, typename U>
-void MovingAverage<T, U>::add(T input) {
+ */
+template <typename T, typename U>
+void MovingAverage<T, U>::add(T input)
+{
   this->input = input;
 }
 
@@ -100,28 +106,34 @@ void MovingAverage<T, U>::add(T input) {
  * based on the selected average types.
  *
  * @param average_types Bitmask representing the average types to print.
-*/
-template<typename T, typename U>
-void MovingAverage<T, U>::print(uint8_t average_types) {
-  while (!Serial) {
+ */
+template <typename T, typename U>
+void MovingAverage<T, U>::print(uint8_t average_types)
+{
+  while (!Serial)
+  {
   }
 
   Serial.print("Raw-Data:");
   Serial.print(this->input);
 
-  if (average_types & SMA) {
+  if (average_types & SMA)
+  {
     Serial.print("\tSMA:");
     Serial.print(this->simple_moving_average);
   }
-  if (average_types & CA) {
+  if (average_types & CA)
+  {
     Serial.print("\tCA:");
     Serial.print(this->cumulative_average);
   }
-  if (average_types & WMA) {
+  if (average_types & WMA)
+  {
     Serial.print("\tWMA:");
     Serial.print(this->weighted_moving_average);
   }
-  if (average_types & EMA) {
+  if (average_types & EMA)
+  {
     Serial.print("\tEMA:");
     Serial.print(this->exponential_moving_average);
   }
@@ -134,10 +146,47 @@ void MovingAverage<T, U>::print(uint8_t average_types) {
  *
  * The raw data points as well as all of the calculated average filter outputs
  * are printed through the serial monitor.
-*/
-template<typename T, typename U>
-void MovingAverage<T, U>::print() {
+ */
+template <typename T, typename U>
+void MovingAverage<T, U>::print()
+{
   this->print(SMA | CA | WMA | EMA);
+}
+
+/**
+ * @brief Filters out peaks from the data points.
+ *
+ * If the given input is greater or equal to a certain threshold value for a specified
+ * amount in a row, then a data peak is retrieved.
+ *
+ * @param threshold The value the input data is compared to.
+ * @param consecutive_matches The amount the data point must be greater or equal to the threshold
+ * in a row, in order to filter out a peak.
+ * @return True if a data peak has been detected, false otherwise.
+ */
+template <typename T, typename U>
+bool MovingAverage<T, U>::detectedPeak(T threshold, uint8_t consecutive_matches)
+{
+  if (!this->enabled)
+    return 0;
+
+  static uint8_t matches;
+
+  if (this->input >= threshold)
+  {
+    matches++;
+
+    if (matches >= consecutive_matches)
+    {
+      matches = 0;
+      return true;
+    }
+  }
+  else
+  {
+    matches = 0;
+    return false;
+  }
 }
 
 /**
@@ -150,21 +199,27 @@ void MovingAverage<T, U>::print() {
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Simple Moving Average (SMA).
-*/
-template<typename T, typename U>
-U MovingAverage<T, U>::readAverage(uint8_t window_size) {
-  if (!this->enabled) return 0;
+ */
+template <typename T, typename U>
+U MovingAverage<T, U>::readAverage(uint8_t window_size)
+{
+  if (!this->enabled)
+    return 0;
 
   static uint8_t num_elements;
   static U *window = new U[window_size];
   static U sum;
 
-  if (num_elements < window_size) {
+  if (num_elements < window_size)
+  {
     window[num_elements] = this->input;
     sum += this->input;
     num_elements++;
-  } else {
-    for (uint8_t i = 0; i < window_size - 1; i++) {
+  }
+  else
+  {
+    for (uint8_t i = 0; i < window_size - 1; i++)
+    {
       sum -= window[i];
       window[i] = window[i + 1];
       sum += window[i];
@@ -188,19 +243,24 @@ U MovingAverage<T, U>::readAverage(uint8_t window_size) {
  *
  * @param input The input data point to be processed.
  * @return The calculated Cumulative Average (CA).
-*/
-template<typename T, typename U>
-U MovingAverage<T, U>::readCumulativeAverage() {
-  if (!this->enabled) return 0;
+ */
+template <typename T, typename U>
+U MovingAverage<T, U>::readCumulativeAverage()
+{
+  if (!this->enabled)
+    return 0;
 
   static uint16_t num_elements;
   static float average;
 
-  if (num_elements <= 2) {
+  if (num_elements <= 2)
+  {
     average += this->input;
     num_elements++;
     average /= num_elements;
-  } else {
+  }
+  else
+  {
     num_elements++;
     average = (this->input + average * (num_elements - 1)) / num_elements;
   }
@@ -220,23 +280,29 @@ U MovingAverage<T, U>::readCumulativeAverage() {
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Weighted Moving Average (WMA).
-*/
-template<typename T, typename U>
-U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
-  if (!this->enabled) return 0;
+ */
+template <typename T, typename U>
+U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size)
+{
+  if (!this->enabled)
+    return 0;
 
   static uint8_t num_elements;
   static U *window = new U[window_size];
   static U sum;
   uint8_t weight_coefficient;
 
-  if (num_elements < window_size) {
+  if (num_elements < window_size)
+  {
     weight_coefficient = num_elements + 1;
     window[num_elements] = this->input;
     sum += this->input * weight_coefficient;
     num_elements++;
-  } else {
-    for (uint8_t i = 0; i < window_size - 1; i++) {
+  }
+  else
+  {
+    for (uint8_t i = 0; i < window_size - 1; i++)
+    {
       weight_coefficient = i + 1;
       sum -= window[i] * weight_coefficient;
       window[i] = window[i + 1];
@@ -264,13 +330,15 @@ U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size) {
  * @param smoothing_factor In interval of [0; 1]. Applies more weight_coefficient to current
  * values, if > 0, or weighs previous average heavier, if < 0.
  * @return The calculated Exponential Moving Average (EMA).
-*/
-template<typename T, typename U>
-U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor) {
-  if (!this->enabled) return 0;
-  
+ */
+template <typename T, typename U>
+U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor)
+{
+  if (!this->enabled)
+    return 0;
+
   static U average;
-  
+
   this->exponential_moving_average = smoothing_factor * (this->input) + (1 - smoothing_factor) * average;
   average = this->exponential_moving_average;
 
