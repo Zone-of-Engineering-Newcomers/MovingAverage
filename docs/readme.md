@@ -1,4 +1,4 @@
-# MovingAverage Library
+# MovingAverage library
 
 The MovingAverage library provides a template class for implementing various types of moving average filters in Arduino projects. It supports Simple Moving Average (SMA), Cumulative Average (CA), Weighted Moving Average (WMA), and Exponential Moving Average (EMA) calculations.
 
