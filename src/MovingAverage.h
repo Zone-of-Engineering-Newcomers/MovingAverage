@@ -1,10 +1,15 @@
 /**
  * @file MovingAverage.h
  *
+ * @brief Defines a template class for implementing various types of moving average filters.
+ *
+ * This file contains the declaration of the MovingAverage template class, which provides functionality
+ * for calculating different types of moving averages including Simple Moving Average (SMA), Cumulative
+ * Average (CA), Weighted Moving Average (WMA), and Exponential Moving Average (EMA).
+ *
  * @author Maximilian Kautzsch
  * @copyright Copyright (c) 2024 Maximilian Kautzsch
  * Licensed under MIT License.
- *
  */
 
 #ifndef MOVINGAVERAGE_H
@@ -26,6 +31,16 @@ enum AverageType
   EMA = 1 << 3
 };
 
+/**
+ * @brief Template class for implementing various types of moving average filters.
+ *
+ * This template class provides functionality for calculating different types of moving averages
+ * including Simple Moving Average (SMA), Cumulative Average (CA), Weighted Moving Average (WMA),
+ * and Exponential Moving Average (EMA).
+ *
+ * @tparam T The type of input data.
+ * @tparam U The type of average calculated.
+ */
 template <typename T, typename U>
 class MovingAverage
 {
@@ -195,7 +210,6 @@ bool MovingAverage<T, U>::detectedPeak(T threshold, uint8_t consecutive_matches)
  * Calculates the SMA based on the provided input and window size.
  * If the MovingAverage object is disabled, returns 0.
  *
- * @param input The input data point to be processed.
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Simple Moving Average (SMA).
@@ -241,7 +255,6 @@ U MovingAverage<T, U>::readAverage(uint8_t window_size)
  * Uses all of the data points up to the current datum.
  * If the MovingAverage object is disabled, returns 0.
  *
- * @param input The input data point to be processed.
  * @return The calculated Cumulative Average (CA).
  */
 template <typename T, typename U>
@@ -276,7 +289,6 @@ U MovingAverage<T, U>::readCumulativeAverage()
  * Gives more weight_coefficient to recent values and lesser weight_coefficient to older values.
  * If the MovingAverage object is disabled, returns 0.
  *
- * @param input The input data point to be processed.
  * @param window_size The size of the data window (amount of data points used for
  * one calculation).
  * @return The calculated Weighted Moving Average (WMA).
@@ -326,7 +338,6 @@ U MovingAverage<T, U>::readWeightedAverage(uint8_t window_size)
  * Apply different weights to current values and the previous average.
  * If the MovingAverage object is disabled, returns 0.
  *
- * @param input The input data point to be processed.
  * @param smoothing_factor In interval of [0; 1]. Applies more weight_coefficient to current
  * values, if > 0, or weighs previous average heavier, if < 0.
  * @return The calculated Exponential Moving Average (EMA).
@@ -345,4 +356,4 @@ U MovingAverage<T, U>::readExponentialAverage(float smoothing_factor)
   return this->exponential_moving_average;
 }
 
-#endif
+#endif // MOVINGAVERAGE_H
