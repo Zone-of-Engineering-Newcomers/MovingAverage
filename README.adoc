@@ -1,3 +1,6 @@
+:repository-owner: Zone-of-Engineering-Newcomers
+:repository-name: MovingAverage
+
 = {repository-name} Library for Arduino =
 
 An easy to use Arduino library for moving average filtering.
