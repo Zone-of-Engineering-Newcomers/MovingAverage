@@ -10,4 +10,5 @@ image:https://github.com/{repository-owner}/{repository-name}/actions/workflows/
 
 An easy to use Arduino library for moving average filtering.
 
-For more information about this library, please see the documentation.
+For more information about this library, please visit us at
+https://www.arduino.cc/reference/en/libraries/moving-average/.
