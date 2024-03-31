@@ -18,7 +18,7 @@ filter.begin();
 
 ### `end()`
 
-Stops the MovingAverage object. Toggles the 'enabled' class attribtute to false.
+Stops the MovingAverage object. Toggles the 'enabled' class attribute to false.
 
 #### Syntax
 

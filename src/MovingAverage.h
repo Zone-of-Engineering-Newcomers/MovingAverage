@@ -83,7 +83,7 @@ MovingAverage<T, U>::~MovingAverage() {}
 /**
  * @brief Initializes the MovingAverage object.
  *
- * Toggles the 'enabled' class attribtute to true.
+ * Toggles the 'enabled' class attribute to true.
  */
 template <typename T, typename U>
 void MovingAverage<T, U>::begin()
@@ -94,7 +94,7 @@ void MovingAverage<T, U>::begin()
 /**
  * @brief Stops the MovingAverage object.
  *
- * Toggles the 'enabled' class attribtute to false.
+ * Toggles the 'enabled' class attribute to false.
  */
 template <typename T, typename U>
 void MovingAverage<T, U>::end()
