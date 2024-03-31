@@ -8,7 +8,7 @@ Initializes the MovingAverage object.
 
 #### Syntax
 
-```Arduino
+```C++
 filter.begin();
 ```
 
@@ -22,7 +22,7 @@ Stops the MovingAverage object. Toggles the 'enabled' class attribtute to false.
 
 #### Syntax
 
-```Arduino
+```C++
 filter.end();
 ```
 
@@ -36,7 +36,7 @@ Adds a new data point to the filter.
 
 #### Syntax
 
-```Arduino
+```C++
 filter.add(input);
 ```
 
@@ -51,7 +51,7 @@ Prints the selected average filter outputs. Firstly, the raw data points are pri
 
 #### Syntax
 
-```Arduino
+```C++
 filter.print();
 filter.print(average_types);
 ```
@@ -63,7 +63,7 @@ filter.print(average_types);
 
 #### Example
 
-```Arduino
+```C++
 #include <MovingAverage.h>
 
 MovingAverage<int, int> filter;
@@ -88,7 +88,7 @@ Filters out peaks from the data points. If the given input is greater or equal t
 
 #### Syntax
 
-```Arduino
+```C++
 filter.detectedPeak();
 ```
 
@@ -100,7 +100,7 @@ filter.detectedPeak();
 
 #### Example
 
-```Arduino
+```C++
 #include <MovingAverage.h>
 
 MovingAverage<int, int> filter;
@@ -130,7 +130,7 @@ Calculates the Simple Moving Average (SMA) based on the provided input and windo
 
 #### Syntax
 
-```Arduino
+```C++
 filter.readAverage();
 ```
 
@@ -149,7 +149,7 @@ Calculates the Cumulative Average (CA) based on the provided input. Uses all of 
 
 #### Syntax
 
-```Arduino
+```C++
 filter.readCumulativeAverage();
 ```
 
@@ -167,7 +167,7 @@ Calculates the Weighted Moving Average (WMA) for a given input. Gives more weigh
 
 #### Syntax
 
-```Arduino
+```C++
 filter.readWeightedAverage();
 ```
 
@@ -186,7 +186,7 @@ Calculates the Exponential Moving Average (EMA) for a given input. Apply differe
 
 #### Syntax
 
-```Arduino
+```C++
 filter.readExponentialAverage();
 ```
 
