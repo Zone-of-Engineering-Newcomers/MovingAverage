@@ -15,7 +15,7 @@
 #ifndef MOVINGAVERAGE_H
 #define MOVINGAVERAGE_H
 
-#include <sys/_stdint.h>
+#include <stdint.h>
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
