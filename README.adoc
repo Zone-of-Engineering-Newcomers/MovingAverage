@@ -1,0 +1,5 @@
+= {repository-name} Library for Arduino =
+
+An easy to use Arduino library for moving average filtering.
+
+For more information about this library, please see the documentation.
