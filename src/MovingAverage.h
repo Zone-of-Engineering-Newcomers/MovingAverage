@@ -15,7 +15,7 @@
 #ifndef MOVINGAVERAGE_H
 #define MOVINGAVERAGE_H
 
-#include <inttypes.h>
+#include <sys/_stdint.h>
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
@@ -23,13 +23,13 @@
 #include "WProgram.h"
 #endif
 
-enum AverageType
+typedef enum
 {
   SMA = 1 << 0,
   CA = 1 << 1,
   WMA = 1 << 2,
   EMA = 1 << 3
-};
+} AverageType;
 
 /**
  * @brief Template class for implementing various types of moving average filters.
