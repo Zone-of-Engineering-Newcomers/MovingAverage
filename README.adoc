@@ -1,4 +1,4 @@
-:repository-owner: MaximilianKautzsch
+:repository-owner: Zone-of-Engineering-Newcomers
 :repository-name: MovingAverage
 
 = {repository-name} Library for Arduino =
