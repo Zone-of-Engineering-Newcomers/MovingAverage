@@ -29,11 +29,12 @@
  *
  * @tparam T The data type of the node's value.
  */
-template<typename T>
-class SkipListNode {
+template <typename T>
+class SkipListNode
+{
 public:
   T value;
-  std::vector<SkipListNode*> next;
+  std::vector<SkipListNode *> next;
 
   SkipListNode(T val, int level);
 };
@@ -45,12 +46,13 @@ public:
  *
  * @tparam T The data type of the values stored in the skip list.
  */
-template<typename T>
-class SkipList {
+template <typename T>
+class SkipList
+{
 private:
   int max_level;
-  SkipListNode<T>* header;
-  std::vector<SkipListNode<T>*> update;
+  SkipListNode<T> *header;
+  std::vector<SkipListNode<T> *> update;
 
   int randomLevel();
 
@@ -64,17 +66,18 @@ public:
   T at(int index) const;
 };
 
-template<typename T>
+template <typename T>
 SkipListNode<T>::SkipListNode(T val, int level)
-  : value(val), next(level + 1, nullptr) {}
+    : value(val), next(level + 1, nullptr) {}
 
 /**
  * @brief Generates a random level for node insertion.
  *
  * @return A random level for the new node.
  */
-template<typename T>
-int SkipList<T>::randomLevel() {
+template <typename T>
+int SkipList<T>::randomLevel()
+{
   int level = 0;
   while (rand() % 2 == 0 && level < max_level)
     level++;
@@ -88,9 +91,10 @@ int SkipList<T>::randomLevel() {
  *
  * @param max_lvl The maximum level of the skip list.
  */
-template<typename T>
+template <typename T>
 SkipList<T>::SkipList(int max_lvl)
-  : max_level(max_lvl) {
+    : max_level(max_lvl)
+{
   header = new SkipListNode<T>(T(), max_level);
 }
 
@@ -99,11 +103,13 @@ SkipList<T>::SkipList(int max_lvl)
  *
  * Cleans up all the nodes in the skip list to free memory.
  */
-template<typename T>
-SkipList<T>::~SkipList() {
-  SkipListNode<T>* node = header->next[0];
-  while (node != nullptr) {
-    SkipListNode<T>* temp = node;
+template <typename T>
+SkipList<T>::~SkipList()
+{
+  SkipListNode<T> *node = header->next[0];
+  while (node != nullptr)
+  {
+    SkipListNode<T> *temp = node;
     node = node->next[0];
     delete temp;
   }
@@ -117,28 +123,33 @@ SkipList<T>::~SkipList() {
  *
  * @param val The value to be inserted.
  */
-template<typename T>
-void SkipList<T>::insert(T val) {
+template <typename T>
+void SkipList<T>::insert(T val)
+{
   update.resize(max_level + 1);
-  SkipListNode<T>* current = header;
+  SkipListNode<T> *current = header;
 
-  for (int i = max_level; i >= 0; i--) {
+  for (int i = max_level; i >= 0; i--)
+  {
     while (current->next[i] != nullptr && current->next[i]->value < val)
       current = current->next[i];
     update[i] = current;
   }
 
   current = current->next[0];
-  if (current == nullptr || current->value != val) {
+  if (current == nullptr || current->value != val)
+  {
     int new_level = randomLevel();
-    if (new_level > max_level) {
+    if (new_level > max_level)
+    {
       update.resize(new_level + 1);
       update[max_level + 1] = header;
       max_level = new_level;
     }
 
-    SkipListNode<T>* newNode = new SkipListNode<T>(val, new_level);
-    for (int i = 0; i <= new_level; i++) {
+    SkipListNode<T> *newNode = new SkipListNode<T>(val, new_level);
+    for (int i = 0; i <= new_level; i++)
+    {
       newNode->next[i] = update[i]->next[i];
       update[i]->next[i] = newNode;
     }
@@ -153,15 +164,18 @@ void SkipList<T>::insert(T val) {
  * @param val The value to be removed.
  * @return True if the value was found and removed, false otherwise.
  */
-template<typename T>
-bool SkipList<T>::remove(T val) {
-  SkipListNode<T>* current = header;
+template <typename T>
+bool SkipList<T>::remove(T val)
+{
+  SkipListNode<T> *current = header;
   bool found = false;
 
-  for (int i = max_level; i >= 0; i--) {
+  for (int i = max_level; i >= 0; i--)
+  {
     while (current->next[i] != nullptr && current->next[i]->value < val)
       current = current->next[i];
-    if (current->next[i] != nullptr && current->next[i]->value == val) {
+    if (current->next[i] != nullptr && current->next[i]->value == val)
+    {
       found = true;
       update[i] = current;
     }
@@ -171,7 +185,8 @@ bool SkipList<T>::remove(T val) {
     return false;
 
   current = update[0]->next[0];
-  for (int i = 0; i <= max_level; i++) {
+  for (int i = 0; i <= max_level; i++)
+  {
     if (update[i]->next[i] != current)
       break;
     update[i]->next[i] = current->next[i];
@@ -191,17 +206,20 @@ bool SkipList<T>::remove(T val) {
  *
  * @return The median value in the skip list.
  */
-template<typename T>
-T SkipList<T>::getMedian() const {
+template <typename T>
+T SkipList<T>::getMedian() const
+{
   int count = 0;
-  SkipListNode<T>* current = header->next[0];
-  while (current != nullptr) {
+  SkipListNode<T> *current = header->next[0];
+  while (current != nullptr)
+  {
     count++;
     current = current->next[0];
   }
 
   current = header->next[0];
-  for (int i = 0; i < count / 2; i++) {
+  for (int i = 0; i < count / 2; i++)
+  {
     current = current->next[0];
   }
 
@@ -214,11 +232,13 @@ T SkipList<T>::getMedian() const {
  * @param index The index of the value to retrieve.
  * @return The value at the specified index.
  */
-template<typename T>
-T SkipList<T>::at(int index) const {
+template <typename T>
+T SkipList<T>::at(int index) const
+{
   int count = 0;
-  SkipListNode<T>* current = header->next[0];
-  while (current != nullptr) {
+  SkipListNode<T> *current = header->next[0];
+  while (current != nullptr)
+  {
     if (count == index)
       return current->value;
     count++;
@@ -227,4 +247,4 @@ T SkipList<T>::at(int index) const {
   throw std::out_of_range("Index out of range");
 }
 
-#endif  // SKIPLIST_H
+#endif // SKIPLIST_H
