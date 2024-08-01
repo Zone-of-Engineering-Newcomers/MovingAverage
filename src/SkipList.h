@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <cstdlib>
+#include <stdexcept>
 
 /**
  * @brief Represents a node in the skip list.
