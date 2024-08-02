@@ -12,7 +12,7 @@
 #else
 #include <cstddef>
 #endif
-#include "Vector/VectorIterator.h"
+#include "VectorIterator.h"
 
 template <typename T>
 class Vector
@@ -93,6 +93,6 @@ inline Print &operator<<(Print &stream,
 }
 #endif
 
-#include "Vector/VectorDefinitions.h"
+#include "VectorDefinitions.h"
 
 #endif
