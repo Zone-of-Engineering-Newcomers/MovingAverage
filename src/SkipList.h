@@ -19,7 +19,7 @@
 #ifndef SKIPLIST_H
 #define SKIPLIST_H
 
-#include <vector>
+#include "Vector.h"
 #include <cstdlib>
 #include <stdexcept>
 
@@ -35,7 +35,7 @@ class SkipListNode
 {
 public:
   T value;
-  std::vector<SkipListNode *> next;
+  Vector<SkipListNode *> next;
 
   SkipListNode(T val, int level);
 };
@@ -53,7 +53,7 @@ class SkipList
 private:
   int max_level;
   SkipListNode<T> *header;
-  std::vector<SkipListNode<T> *> update;
+  Vector<SkipListNode<T> *> update;
 
   int randomLevel();
 
