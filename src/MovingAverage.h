@@ -20,7 +20,7 @@
 #define MOVINGAVERAGE_H
 
 #include <stdint.h>
-#include "Vector.h"
+#include <vector>
 #include <numeric>
 #include "SkipList.h"
 
@@ -88,8 +88,8 @@ private:
   U weighted_moving_average;
   U exponential_moving_average;
   U moving_median;
-  Vector<U> window;
-  Vector<U> cumulative_data;
+  std::vector<U> window;
+  std::vector<U> cumulative_data;
 
   void updateWindow(uint8_t window_size);
 };
