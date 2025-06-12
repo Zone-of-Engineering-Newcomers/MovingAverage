@@ -17,9 +17,7 @@
 #ifndef SKIPLIST_H
 #define SKIPLIST_H
 
-#include "Vector.h"   // Custom vector library for Arduino
-#include <cstdlib>    // For rand()
-#include <stdexcept>  // For std::out_of_range
+#include "Vector.h"  // Custom vector library for Arduino
 
 /**
  * @class SkipListNode
@@ -70,14 +68,15 @@ private:
     SkipListNode<T> *header;
 
     /**
-     * @brief A vector used to keep track of update Positions during insertion and deletion.
+     * @brief A vector used to keep track of update positions during insertion and deletion.
      */
     Vector<SkipListNode<T> *> update;
 
     /**
      * @brief Generates a random level for a new node.
      * @return A random level between 0 and max_level.
-     * @details The level is randomly chosen based on a coin flip (rand() % 2 == 0) until max_level is reached.
+     * @details The level is randomly chosen based on a coin flip (random(2) == 0) until max_level is reached.
+     * @note The user should call randomSeed() in their setup() function to ensure proper randomness.
      */
     int randomLevel();
 
@@ -114,57 +113,37 @@ public:
      * @brief Retrieves the median value from the skip list.
      * @return The median value.
      * @details Traverses the skip list to find and return the median value.
-     * @throws std::out_of_range if the skip list is empty.
      */
     T getMedian() const;
 
     /**
      * @brief Retrieves the value at the specified index in the skip list.
      * @param index The index of the value to retrieve.
-     * @return The value at the specified index.
-     * @throws std::out_of_range if the index is out of range.
+     * @param value Reference to store the retrieved value.
+     * @return True if the index is valid, false otherwise.
      * @details Traverses the skip list to find and return the value at the given index.
      */
-    T at(int index) const;
+    bool at(int index, T& value) const;
 };
 
-/**
- * @brief Constructs a SkipListNode with the given value and level.
- * @param val The value to store in the node.
- * @param level The level of the node, determining the size of the next vector.
- */
 template <typename T>
 SkipListNode<T>::SkipListNode(T val, int level) : value(val), next(level + 1, nullptr) {}
 
-/**
- * @brief Generates a random level for node insertion.
- * @return A random level for the new node.
- * @details The level is randomly chosen based on a coin flip (rand() % 2 == 0) until max_level is reached.
- */
 template <typename T>
 int SkipList<T>::randomLevel()
 {
     int level = 0;
-    while (rand() % 2 == 0 && level < max_level)
+    while (random(2) == 0 && level < max_level)
         level++;
     return level;
 }
 
-/**
- * @brief Constructs a SkipList object.
- * @param max_lvl The maximum level of the skip list.
- * @details Initializes the skip list with the given maximum level and creates the header node.
- */
 template <typename T>
 SkipList<T>::SkipList(int max_lvl) : max_level(max_lvl)
 {
     header = new SkipListNode<T>(T(), max_level);
 }
 
-/**
- * @brief Destructs the SkipList object.
- * @details Cleans up all the nodes in the skip list to free memory.
- */
 template <typename T>
 SkipList<T>::~SkipList()
 {
@@ -178,11 +157,6 @@ SkipList<T>::~SkipList()
     delete header;
 }
 
-/**
- * @brief Inserts a new value into the skip list.
- * @param val The value to insert.
- * @details Adds a new node with the specified value at the appropriate position in the skip list.
- */
 template <typename T>
 void SkipList<T>::insert(T val)
 {
@@ -216,12 +190,6 @@ void SkipList<T>::insert(T val)
     }
 }
 
-/**
- * @brief Removes a value from the skip list.
- * @param val The value to remove.
- * @return True if the value was found and removed, false otherwise.
- * @details Deletes the node containing the specified value from the skip list.
- */
 template <typename T>
 bool SkipList<T>::remove(T val)
 {
@@ -229,7 +197,7 @@ bool SkipList<T>::remove(T val)
     bool found = false;
 
     for (int i = max_level; i >= 0; i--)
-        {
+    {
         while (current->next[i] != nullptr && current->next[i]->value < val)
             current = current->next[i];
         if (current->next[i] != nullptr && current->next[i]->value == val)
@@ -257,12 +225,6 @@ bool SkipList<T>::remove(T val)
     return true;
 }
 
-/**
- * @brief Retrieves the median value from the skip list.
- * @return The median value.
- * @details Traverses the skip list to find and return the median value.
- * @throws std::out_of_range if the skip list is empty.
- */
 template <typename T>
 T SkipList<T>::getMedian() const
 {
@@ -275,7 +237,7 @@ T SkipList<T>::getMedian() const
     }
 
     if (count == 0)
-        throw std::out_of_range("Skip list is empty");
+        return T(); // Return default value (not ideal but works for now)
 
     current = header->next[0];
     for (int i = 0; i < count / 2; i++)
@@ -286,26 +248,22 @@ T SkipList<T>::getMedian() const
     return current->value;
 }
 
-/**
- * @brief Retrieves the value at the specified index in the skip list.
- * @param index The index of the value to retrieve.
- * @return The value at the specified index.
- * @throws std::out_of_range if the index is out of range.
- * @details Traverses the skip list to find and return the value at the given index.
- */
 template <typename T>
-T SkipList<T>::at(int index) const
+bool SkipList<T>::at(int index, T& value) const
 {
     int count = 0;
     SkipListNode<T> *current = header->next[0];
     while (current != nullptr)
     {
         if (count == index)
-            return current->value;
+        {
+            value = current->value;
+            return true;
+        }
         count++;
         current = current->next[0];
     }
-    throw std::out_of_range("Index out of range");
+    return false;
 }
 
 #endif // SKIPLIST_H

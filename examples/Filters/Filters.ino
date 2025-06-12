@@ -6,7 +6,7 @@
  * Licensed under MIT License.
 */
 
-#include <MovingAverage.h>
+#include "MovingAverage.h"
 
 MovingAverage<> filter;  // Create instance of the moving average class for filtering the data
 
